@@ -15,6 +15,7 @@ import { useFormik } from 'formik';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useEffect } from 'react';
+import { useMutation } from 'react-query';
 
 interface LoginFormikInputType {
   email: string;
@@ -22,10 +23,30 @@ interface LoginFormikInputType {
 }
 
 const Home: NextPage = () => {
+  const { instance } = useApi();
+
+  const loginMutation = useMutation(async (payload: LoginFormikInputType) => {
+    try {
+      await instance.post('/auth/login', { ...payload });
+    } catch (error) {
+      throw new Error(error);
+    }
+  });
+
   const toast = useToast();
   const handleSubmit = (values: LoginFormikInputType) => {
     try {
-      console.log(values);
+      const payload = { email: values.email, password: values.password };
+
+      loginMutation.mutate(payload);
+
+      toast({
+        title: 'Login Success',
+        status: 'success',
+        position: 'top-right',
+        isClosable: true,
+        duration: 1000,
+      });
     } catch (error) {
       const err = error as Error;
       toast({
@@ -98,7 +119,7 @@ const Home: NextPage = () => {
                   name="password"
                   type={'password'}
                   onChange={formik.handleChange}
-                  value={formik.values.email}
+                  value={formik.values.password}
                   placeholder="Enter your email here"
                 />
                 <InputErrorMessage name="password" formik={formik} />
