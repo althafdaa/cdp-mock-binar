@@ -1,5 +1,9 @@
 {
   "parser": "@typescript-eslint/parser",
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "off",
+    "react-hooks/exhaustive-deps": "off"
+  },
   "parserOptions": {
     "project": "./tsconfig.json"
   },

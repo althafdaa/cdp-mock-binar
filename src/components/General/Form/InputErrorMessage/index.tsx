@@ -1,5 +1,4 @@
 import { FormErrorMessage } from '@chakra-ui/react';
-import { motion } from 'framer-motion';
 import React, { FC } from 'react';
 
 interface InputErrorMessageProps {
@@ -11,10 +10,6 @@ const InputErrorMessage: FC<InputErrorMessageProps> = ({ name, formik }) => {
   const formValidationErrorProps = {
     fontSize: 'xs',
     color: 'red',
-    as: motion.span,
-    initial: { opacity: 0.5, y: -5 },
-    animate: { opacity: 1, y: 1 },
-    exit: { opacity: 0 },
   };
 
   return (
