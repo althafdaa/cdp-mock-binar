@@ -8,11 +8,15 @@ import {
   Box,
   useToast,
   Heading,
+  Text,
 } from '@chakra-ui/react';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useFormik } from 'formik';
 import { RegisterValidationSchema } from '@/utils/validation';
+import { useMutation } from 'react-query';
+import { useApi } from '@/hooks/useApi';
+import Link from 'next/link';
 
 interface RegisterFormikInputType {
   name: string;
@@ -21,11 +25,46 @@ interface RegisterFormikInputType {
 }
 
 const RegisterPage: NextPage = () => {
+  const { instance } = useApi();
+
+  const registerMutation = useMutation(
+    async (payload: RegisterFormikInputType) => {
+      try {
+        return await instance.post('/auth/signup', { ...payload });
+      } catch (error) {
+        const err = error as Error;
+        throw new Error(err.message);
+      }
+    }
+  );
+
   const toast = useToast();
 
   const handleSubmit = async (values: RegisterFormikInputType) => {
     try {
       console.log(values);
+      registerMutation.mutate(values, {
+        onSuccess: ({ data }) => {
+          if (Boolean(data.errors)) {
+            toast({
+              title: 'Something went wrong',
+              status: 'error',
+              position: 'top-right',
+              isClosable: true,
+              duration: 1000,
+            });
+            return;
+          }
+
+          toast({
+            title: 'Registration Success',
+            status: 'success',
+            position: 'top-right',
+            isClosable: true,
+            duration: 1000,
+          });
+        },
+      });
     } catch (error) {
       const err = error as Error;
       toast({
@@ -120,6 +159,12 @@ const RegisterPage: NextPage = () => {
               </Button>
             </form>
           </Box>
+          <Text fontSize={'sm'} textAlign="center">
+            Already have an account ?{' '}
+            <Link href={'/'} passHref>
+              <a>Login</a>
+            </Link>
+          </Text>
         </Box>
       </PageWrapper>
     </>

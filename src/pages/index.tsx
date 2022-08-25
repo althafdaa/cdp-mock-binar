@@ -43,8 +43,6 @@ const Home: NextPage = () => {
 
       loginMutation.mutate(payload, {
         onSuccess: ({ data }) => {
-          console.log(data);
-
           if (data.message === 'ERROR') {
             toast({
               title: 'Something went wrong',
