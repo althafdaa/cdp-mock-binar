@@ -17,6 +17,7 @@ import { RegisterValidationSchema } from '@/utils/validation';
 import { useMutation } from 'react-query';
 import { useApi } from '@/hooks/useApi';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 interface RegisterFormikInputType {
   name: string;
@@ -26,6 +27,8 @@ interface RegisterFormikInputType {
 
 const RegisterPage: NextPage = () => {
   const { instance } = useApi();
+  const router = useRouter();
+  const toast = useToast();
 
   const registerMutation = useMutation(
     async (payload: RegisterFormikInputType) => {
@@ -37,8 +40,6 @@ const RegisterPage: NextPage = () => {
       }
     }
   );
-
-  const toast = useToast();
 
   const handleSubmit = async (values: RegisterFormikInputType) => {
     try {
@@ -63,6 +64,7 @@ const RegisterPage: NextPage = () => {
             isClosable: true,
             duration: 1000,
           });
+          router.push('/');
         },
       });
     } catch (error) {
@@ -154,7 +156,11 @@ const RegisterPage: NextPage = () => {
                 <InputErrorMessage name="password" formik={formik} />
               </FormControl>
 
-              <Button type="submit" colorScheme={'whatsapp'}>
+              <Button
+                type="submit"
+                colorScheme={'whatsapp'}
+                isLoading={formik.isSubmitting}
+              >
                 Register
               </Button>
             </form>

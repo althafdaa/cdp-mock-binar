@@ -13,19 +13,36 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { useFormik } from 'formik';
-import type { NextPage } from 'next';
+import type { GetServerSidePropsContext, NextPage } from 'next';
 import Head from 'next/head';
-import { setCookie } from 'nookies';
+import nookies, { setCookie } from 'nookies';
 import { useMutation } from 'react-query';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 interface LoginFormikInputType {
   email: string;
   password: string;
 }
 
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+  const { token } = nookies.get(ctx);
+
+  if (token) {
+    return {
+      props: {},
+      redirect: { permanent: false, destination: '/dashboard' },
+    };
+  } else {
+    return {
+      props: {},
+    };
+  }
+}
+
 const Home: NextPage = () => {
   const { instance } = useApi();
+  const router = useRouter();
 
   const loginMutation = useMutation(async (payload: LoginFormikInputType) => {
     try {
@@ -37,7 +54,7 @@ const Home: NextPage = () => {
   });
 
   const toast = useToast();
-  const handleSubmit = (values: LoginFormikInputType) => {
+  const handleSubmit = (values: LoginFormikInputType, action) => {
     try {
       const payload = { email: values.email, password: values.password };
 
@@ -51,6 +68,7 @@ const Home: NextPage = () => {
               isClosable: true,
               duration: 1000,
             });
+            action.setSubmitting(false);
             return;
           }
           toast({
@@ -65,6 +83,8 @@ const Home: NextPage = () => {
             maxAge: 30 * 24 * 60 * 60,
             path: '/',
           });
+
+          router.push('/dashboard');
         },
       });
     } catch (error) {
@@ -145,7 +165,11 @@ const Home: NextPage = () => {
                 <InputErrorMessage name="password" formik={formik} />
               </FormControl>
 
-              <Button type="submit" colorScheme={'whatsapp'}>
+              <Button
+                type="submit"
+                colorScheme={'whatsapp'}
+                isLoading={formik.isSubmitting}
+              >
                 Login
               </Button>
             </form>
