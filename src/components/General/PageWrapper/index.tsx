@@ -3,11 +3,12 @@ import React, { FC, ReactNode } from 'react';
 
 interface PageWrapperProps {
   children: ReactNode;
+  stylingProps?: object;
 }
 
-const PageWrapper: FC<PageWrapperProps> = ({ children }) => {
+const PageWrapper: FC<PageWrapperProps> = ({ children, stylingProps }) => {
   return (
-    <Box as="main" maxW="1080px" w="full">
+    <Box as="main" maxW="1080px" w="full" {...stylingProps}>
       {children}
     </Box>
   );
