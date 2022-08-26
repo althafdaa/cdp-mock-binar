@@ -59,15 +59,20 @@ export async function getServerSideProps(
 const DashboardPage: NextPage<DashboardPageType> = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { instance } = useApi();
-  const { data, isLoading, isError } = useQuery(['products'], async () => {
-    try {
-      const { data } = await instance.get('/v1/products');
+  const { data, isLoading, isError, refetch } = useQuery(
+    ['products'],
+    async () => {
+      try {
+        const { data } = await instance.get('/v1/products');
 
-      return data.result;
-    } catch (error) {
-      console.log(error);
+        return data.result;
+      } catch (error) {
+        console.log(error);
+      }
     }
-  });
+  );
+
+  console.log(data);
 
   if (isError) return <Text>...Something went wrong</Text>;
 
@@ -75,7 +80,7 @@ const DashboardPage: NextPage<DashboardPageType> = () => {
 
   return (
     <>
-      <ProductModal isOpen={isOpen} onClose={onClose} />
+      <ProductModal isOpen={isOpen} onClose={onClose} refetch={refetch} />
       <Navbar onOpen={onOpen} />
       <Head>
         <title>Dashboard | Mock Test</title>

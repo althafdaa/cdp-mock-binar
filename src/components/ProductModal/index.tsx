@@ -1,3 +1,4 @@
+import { useApi } from '@/hooks/useApi';
 import { AddProductValidationSchema, isFormInvalid } from '@/utils/validation';
 import {
   Modal,
@@ -12,15 +13,25 @@ import {
   FormLabel,
   Input,
   Box,
+  useToast,
 } from '@chakra-ui/react';
 import { useFormik } from 'formik';
 import React, { FC } from 'react';
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  RefetchQueryFilters,
+  useMutation,
+} from 'react-query';
 import InputErrorMessage from '../General/Form/InputErrorMessage';
 
 interface ProductModalProps {
   title?: string;
   isOpen: boolean;
   onClose: () => void;
+  refetch: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
+  ) => Promise<QueryObserverResult<any, unknown>>;
 }
 
 interface ProductModalFormikType {
@@ -29,10 +40,34 @@ interface ProductModalFormikType {
   imageurl: string;
 }
 
-const ProductModal: FC<ProductModalProps> = ({ isOpen, onClose }) => {
+const ProductModal: FC<ProductModalProps> = ({ isOpen, onClose, refetch }) => {
+  const { instance } = useApi();
+  const toast = useToast();
+  const productMutation = useMutation(
+    async (payload: ProductModalFormikType) => {
+      try {
+        return await instance.post('/v1/products', { ...payload });
+      } catch (error) {
+        const err = error as Error;
+        throw new Error(err.message);
+      }
+    }
+  );
+
   const formik = useFormik({
-    onSubmit: (values: ProductModalFormikType) => {
-      console.log(values);
+    onSubmit: async (values: ProductModalFormikType) => {
+      productMutation.mutate(values, {
+        onSuccess: () => {
+          refetch();
+          toast({
+            status: 'success',
+            title: 'Product added',
+            duration: 1000,
+            position: 'top-right',
+          });
+          onClose();
+        },
+      });
     },
     initialValues: {
       name: '',
@@ -94,7 +129,11 @@ const ProductModal: FC<ProductModalProps> = ({ isOpen, onClose }) => {
             <Button colorScheme="pink" mr={3} onClick={onClose}>
               Back
             </Button>
-            <Button type="submit" colorScheme={'whatsapp'}>
+            <Button
+              type="submit"
+              colorScheme={'whatsapp'}
+              isLoading={formik.isSubmitting}
+            >
               Add Product
             </Button>
           </ModalFooter>
