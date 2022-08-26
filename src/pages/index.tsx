@@ -1,7 +1,7 @@
 import InputErrorMessage from '@/components/General/Form/InputErrorMessage';
 import PageWrapper from '@/components/General/PageWrapper';
 import { useApi } from '@/hooks/useApi';
-import { LoginValidationSchema } from '@/utils/validation';
+import { isFormInvalid, LoginValidationSchema } from '@/utils/validation';
 import {
   Box,
   Button,
@@ -54,7 +54,7 @@ const Home: NextPage = () => {
   });
 
   const toast = useToast();
-  const handleSubmit = (values: LoginFormikInputType, action) => {
+  const handleSubmit = (values: LoginFormikInputType, action: any) => {
     try {
       const payload = { email: values.email, password: values.password };
 
@@ -108,13 +108,6 @@ const Home: NextPage = () => {
     validationSchema: LoginValidationSchema,
   });
 
-  const isFormInvalid = (name: string) => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    if (formik.errors[name] && formik.touched[name]) return true;
-    else false;
-  };
-
   return (
     <>
       <Head>
@@ -140,7 +133,7 @@ const Home: NextPage = () => {
               onSubmit={formik.handleSubmit}
               style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
             >
-              <FormControl isInvalid={isFormInvalid('email')}>
+              <FormControl isInvalid={isFormInvalid('email', formik)}>
                 <FormLabel>Email</FormLabel>
                 <Input
                   name="email"
@@ -153,7 +146,7 @@ const Home: NextPage = () => {
                 <InputErrorMessage name="email" formik={formik} />
               </FormControl>
 
-              <FormControl isInvalid={isFormInvalid('password')}>
+              <FormControl isInvalid={isFormInvalid('password', formik)}>
                 <FormLabel>Password</FormLabel>
                 <Input
                   name="password"

@@ -1,7 +1,9 @@
 import Card from '@/components/General/Card';
 import PageWrapper from '@/components/General/PageWrapper';
+import ProductModal from '@/components/ProductModal';
 import { useApi } from '@/hooks/useApi';
-import { Box } from '@chakra-ui/react';
+import Navbar from '@/layouts/Navbar';
+import { Box, Text, useDisclosure } from '@chakra-ui/react';
 import axios from 'axios';
 import type { GetServerSidePropsContext, NextPage } from 'next';
 import Head from 'next/head';
@@ -35,23 +37,29 @@ export async function getServerSideProps(
   }
 
   await queryClient.prefetchQuery(['products'], async () => {
-    await axios.get('https://test-binar.herokuapp.com/v1/products', {
-      headers: {
-        Authorization: token,
-      },
-    });
+    const { data } = await axios.get(
+      'https://test-binar.herokuapp.com/v1/products',
+      {
+        headers: {
+          Authorization: token,
+        },
+      }
+    );
+
+    return data.result;
   });
 
-  const dehydratedState = JSON.parse(JSON.stringify(dehydrate(queryClient)));
+  const dehydratedState = dehydrate(queryClient);
 
   return {
     props: { token, dehydratedState },
   };
 }
 
-const DashboardPage: NextPage<DashboardPageType> = ({ token }) => {
+const DashboardPage: NextPage<DashboardPageType> = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const { instance } = useApi();
-  const { data, error, isLoading } = useQuery(['products'], async () => {
+  const { data, isLoading, isError } = useQuery(['products'], async () => {
     try {
       const { data } = await instance.get('/v1/products');
 
@@ -61,10 +69,14 @@ const DashboardPage: NextPage<DashboardPageType> = ({ token }) => {
     }
   });
 
-  if (isLoading) return <div>...Loading</div>;
+  if (isError) return <Text>...Something went wrong</Text>;
+
+  if (isLoading) return <Text>...Loading</Text>;
 
   return (
     <>
+      <ProductModal isOpen={isOpen} onClose={onClose} />
+      <Navbar onOpen={onOpen} />
       <Head>
         <title>Dashboard | Mock Test</title>
       </Head>
@@ -72,8 +84,12 @@ const DashboardPage: NextPage<DashboardPageType> = ({ token }) => {
       <PageWrapper>
         <Box
           display={'grid'}
-          gridTemplateColumns="repeat(3, minmax(0, 1fr))"
-          gap={'0.5rem'}
+          gridTemplateColumns={{
+            sm: 'repeat(2, minmax(0, 1fr))',
+            lg: 'repeat(3, minmax(0, 1fr))',
+          }}
+          gap={'1rem'}
+          placeContent="center"
         >
           {data?.map((item: ProductTypes, idx: number) => {
             return <Card item={item} key={`${idx}-${item.id}`} />;

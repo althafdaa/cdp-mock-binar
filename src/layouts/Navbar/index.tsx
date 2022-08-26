@@ -5,9 +5,10 @@ import React, { FC } from 'react';
 
 interface NavbarProps {
   stylingProps?: object;
+  onOpen: () => void;
 }
 
-const Navbar: FC<NavbarProps> = ({ stylingProps }) => {
+const Navbar: FC<NavbarProps> = ({ stylingProps, onOpen }) => {
   const router = useRouter();
   const toast = useToast();
 
@@ -48,7 +49,9 @@ const Navbar: FC<NavbarProps> = ({ stylingProps }) => {
         >
           <Flex gap={'1rem'} alignItems="center">
             <Heading>Product List</Heading>
-            <Button colorScheme={'whatsapp'}>Add Product</Button>
+            <Button colorScheme={'whatsapp'} onClick={onOpen}>
+              Add Product
+            </Button>
           </Flex>
 
           <Button colorScheme={'pink'} onClick={logoutHandler}>

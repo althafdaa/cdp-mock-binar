@@ -13,7 +13,7 @@ import {
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useFormik } from 'formik';
-import { RegisterValidationSchema } from '@/utils/validation';
+import { isFormInvalid, RegisterValidationSchema } from '@/utils/validation';
 import { useMutation } from 'react-query';
 import { useApi } from '@/hooks/useApi';
 import Link from 'next/link';
@@ -43,7 +43,6 @@ const RegisterPage: NextPage = () => {
 
   const handleSubmit = async (values: RegisterFormikInputType) => {
     try {
-      console.log(values);
       registerMutation.mutate(values, {
         onSuccess: ({ data }) => {
           if (Boolean(data.errors)) {
@@ -89,13 +88,6 @@ const RegisterPage: NextPage = () => {
     validationSchema: RegisterValidationSchema,
   });
 
-  const isFormInvalid = (name: string) => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    if (formik.errors[name] && formik.touched[name]) return true;
-    else false;
-  };
-
   return (
     <>
       <Head>
@@ -119,7 +111,7 @@ const RegisterPage: NextPage = () => {
               onSubmit={formik.handleSubmit}
               style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
             >
-              <FormControl isInvalid={isFormInvalid('email')}>
+              <FormControl isInvalid={isFormInvalid('name', formik)}>
                 <FormLabel>Name</FormLabel>
                 <Input
                   name="name"
@@ -131,7 +123,7 @@ const RegisterPage: NextPage = () => {
 
                 <InputErrorMessage name="name" formik={formik} />
               </FormControl>
-              <FormControl isInvalid={isFormInvalid('email')}>
+              <FormControl isInvalid={isFormInvalid('email', formik)}>
                 <FormLabel>Email</FormLabel>
                 <Input
                   name="email"
@@ -144,7 +136,7 @@ const RegisterPage: NextPage = () => {
                 <InputErrorMessage name="email" formik={formik} />
               </FormControl>
 
-              <FormControl isInvalid={isFormInvalid('password')}>
+              <FormControl isInvalid={isFormInvalid('password', formik)}>
                 <FormLabel>Password</FormLabel>
                 <Input
                   name="password"

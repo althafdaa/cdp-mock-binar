@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { Center } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
-import Navbar from './Navbar';
+import Navbar from '../Navbar';
 
 interface WrapperProps {
   children: React.ReactNode;
@@ -9,9 +9,9 @@ interface WrapperProps {
 
 const Wrapper: FC<WrapperProps> = ({ children }) => {
   const router = useRouter();
-  const publicPaths = ['/', '/register'];
+  // const publicPaths = ['/', '/register'];
 
-  const nonAuth = publicPaths.some((item) => item === router.asPath);
+  // const nonAuth = publicPaths.some((item) => item === router.asPath);
   return (
     <Center
       mx={'auto'}
@@ -20,8 +20,6 @@ const Wrapper: FC<WrapperProps> = ({ children }) => {
       display="flex"
       flexDirection={'column'}
     >
-      {!nonAuth && <Navbar />}
-
       {children}
     </Center>
   );
