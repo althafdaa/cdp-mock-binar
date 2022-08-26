@@ -72,8 +72,6 @@ const DashboardPage: NextPage<DashboardPageType> = () => {
     }
   );
 
-  console.log(data);
-
   if (isError) return <Text>...Something went wrong</Text>;
 
   if (isLoading) return <Text>...Loading</Text>;
