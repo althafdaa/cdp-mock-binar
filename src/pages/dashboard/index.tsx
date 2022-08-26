@@ -59,7 +59,7 @@ export async function getServerSideProps(
 const DashboardPage: NextPage<DashboardPageType> = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { instance } = useApi();
-  const { data, isLoading, isError, refetch } = useQuery(
+  const { data, isLoading, isError, refetch, isRefetching } = useQuery(
     ['products'],
     async () => {
       try {
@@ -95,7 +95,9 @@ const DashboardPage: NextPage<DashboardPageType> = () => {
           placeContent="center"
         >
           {data?.map((item: ProductTypes, idx: number) => {
-            return <Card item={item} key={`${idx}-${item.id}`} />;
+            return (
+              <Card item={item} key={`${idx}-${item.id}`} refetch={refetch} />
+            );
           })}
         </Box>
       </PageWrapper>
