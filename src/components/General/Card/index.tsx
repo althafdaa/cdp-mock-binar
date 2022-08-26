@@ -1,9 +1,10 @@
 import DeleteIcon from '@/assets/icons/DeleteIcon';
 import EditIcon from '@/assets/icons/EditIcon';
 import ConfirmationModal from '@/components/ConfirmationModal';
+import UpdateProductModal from '@/components/UpdateProductModal';
 import { useApi } from '@/hooks/useApi';
 import { ProductTypes } from '@/pages/dashboard';
-import { Box, Img, useDisclosure } from '@chakra-ui/react';
+import { Box, Img, useDisclosure, useToast } from '@chakra-ui/react';
 import React, { FC } from 'react';
 import {
   RefetchOptions,
@@ -20,7 +21,13 @@ interface CardProps {
 }
 
 const Card: FC<CardProps> = ({ item, refetch }) => {
+  const {
+    isOpen: isOpenUpdateModal,
+    onOpen: onOpenUpdateModal,
+    onClose: onCloseUpdateModal,
+  } = useDisclosure();
   const { instance } = useApi();
+  const toast = useToast();
   const deleteMutation = useMutation(async (id: number) => {
     try {
       return instance.delete(`/v1/products/${id}`);
@@ -37,6 +44,14 @@ const Card: FC<CardProps> = ({ item, refetch }) => {
           refetch();
           onClose();
         },
+        onError: () => {
+          toast({
+            status: 'error',
+            title: 'Something went wrong!',
+            duration: 1000,
+            position: 'top-right',
+          });
+        },
       });
     } catch (error) {
       console.log(error);
@@ -45,6 +60,13 @@ const Card: FC<CardProps> = ({ item, refetch }) => {
 
   return (
     <>
+      <UpdateProductModal
+        isOpen={isOpenUpdateModal}
+        onClose={onCloseUpdateModal}
+        refetch={refetch}
+        item={item}
+      />
+
       <ConfirmationModal
         isOpen={isOpen}
         onClose={onClose}
@@ -72,7 +94,7 @@ const Card: FC<CardProps> = ({ item, refetch }) => {
           rounded="lg"
           m={'0.2rem'}
         >
-          <Box as="button">
+          <Box as="button" onClick={onOpenUpdateModal}>
             <EditIcon styleProps={{ style: { height: '24px' } }} />
           </Box>
           <Box as="button" onClick={onOpen}>

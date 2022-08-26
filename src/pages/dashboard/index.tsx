@@ -46,7 +46,7 @@ export async function getServerSideProps(
       }
     );
 
-    return data.result;
+    return data.result.reverse();
   });
 
   const dehydratedState = dehydrate(queryClient);
@@ -58,14 +58,15 @@ export async function getServerSideProps(
 
 const DashboardPage: NextPage<DashboardPageType> = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+
   const { instance } = useApi();
-  const { data, isLoading, isError, refetch, isRefetching } = useQuery(
+  const { data, isLoading, isError, refetch } = useQuery(
     ['products'],
     async () => {
       try {
         const { data } = await instance.get('/v1/products');
 
-        return data.result;
+        return data.result.reverse();
       } catch (error) {
         console.log(error);
       }

@@ -1,4 +1,5 @@
 import { useApi } from '@/hooks/useApi';
+import { ProductTypes } from '@/pages/dashboard';
 import { AddProductValidationSchema, isFormInvalid } from '@/utils/validation';
 import {
   Modal,
@@ -25,28 +26,45 @@ import {
 } from 'react-query';
 import InputErrorMessage from '../General/Form/InputErrorMessage';
 
-interface ProductModalProps {
+interface UpdateProductModalTypes {
   title?: string;
   isOpen: boolean;
   onClose: () => void;
   refetch: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
   ) => Promise<QueryObserverResult<any, unknown>>;
+  item: ProductTypes;
 }
 
-interface ProductModalFormikType {
-  name: string;
-  price: string;
-  imageurl: string;
+interface UpdateProductModalFormikType {
+  id: number;
+  name?: string;
+  price?: string;
+  imageurl?: string;
 }
 
-const ProductModal: FC<ProductModalProps> = ({ isOpen, onClose, refetch }) => {
+const UpdateProductModal: FC<UpdateProductModalTypes> = ({
+  isOpen,
+  onClose,
+  refetch,
+  item,
+}) => {
   const { instance } = useApi();
   const toast = useToast();
-  const productMutation = useMutation(
-    async (payload: ProductModalFormikType) => {
+  const updateProductMutation = useMutation(
+    async (data: UpdateProductModalFormikType) => {
+      const { name, imageurl, price } = data || {};
+
+      const payload = { name, imageurl, price };
+
+      if (!name) delete payload.name;
+      if (!imageurl) delete payload.imageurl;
+      if (!price) delete payload.price;
+
       try {
-        return await instance.post('/v1/products', { ...payload });
+        return await instance.put(`/v1/products${data.id}`, {
+          ...payload,
+        });
       } catch (error) {
         const err = error as Error;
         throw new Error(err.message);
@@ -56,35 +74,39 @@ const ProductModal: FC<ProductModalProps> = ({ isOpen, onClose, refetch }) => {
 
   const formik = useFormik({
     onSubmit: async (
-      values: ProductModalFormikType,
+      values: UpdateProductModalFormikType,
       actions: FormikHelpers<any>
     ) => {
-      productMutation.mutate(values, {
-        onSuccess: () => {
-          refetch();
-          toast({
-            status: 'success',
-            title: 'Product added',
-            duration: 1000,
-            position: 'top-right',
-          });
-          onClose();
-          actions.resetForm();
-        },
-        onError: () => {
-          toast({
-            status: 'error',
-            title: 'Something went wrong!',
-            duration: 1000,
-            position: 'top-right',
-          });
-        },
-      });
+      updateProductMutation.mutate(
+        { ...values, id: item.id },
+        {
+          onSuccess: () => {
+            refetch();
+            toast({
+              status: 'success',
+              title: 'Product added',
+              duration: 1000,
+              position: 'top-right',
+            });
+            onClose();
+            actions.resetForm();
+          },
+          onError: () => {
+            toast({
+              status: 'error',
+              title: 'Something went wrong',
+              duration: 1000,
+              position: 'top-right',
+            });
+          },
+        }
+      );
     },
     initialValues: {
-      name: '',
-      price: '',
-      imageurl: '',
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      imageurl: item.imageurl,
     },
     validationSchema: AddProductValidationSchema,
   });
@@ -93,7 +115,7 @@ const ProductModal: FC<ProductModalProps> = ({ isOpen, onClose, refetch }) => {
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Add Product</ModalHeader>
+        <ModalHeader>Update Product</ModalHeader>
         <ModalCloseButton />
         <form onSubmit={formik.handleSubmit}>
           <ModalBody>
@@ -146,7 +168,7 @@ const ProductModal: FC<ProductModalProps> = ({ isOpen, onClose, refetch }) => {
               colorScheme={'whatsapp'}
               isLoading={formik.isSubmitting}
             >
-              Add Product
+              Update
             </Button>
           </ModalFooter>
         </form>
@@ -155,4 +177,4 @@ const ProductModal: FC<ProductModalProps> = ({ isOpen, onClose, refetch }) => {
   );
 };
 
-export default ProductModal;
+export default UpdateProductModal;
