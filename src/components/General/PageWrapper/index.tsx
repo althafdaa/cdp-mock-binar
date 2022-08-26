@@ -8,7 +8,7 @@ interface PageWrapperProps {
 
 const PageWrapper: FC<PageWrapperProps> = ({ children, stylingProps }) => {
   return (
-    <Box as="main" maxW="1080px" w="full" {...stylingProps}>
+    <Box as="main" maxW="1080px" pb={'2rem'} w="full" {...stylingProps}>
       {children}
     </Box>
   );

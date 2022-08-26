@@ -1,13 +1,8 @@
 import DeleteIcon from '@/assets/icons/DeleteIcon';
 import EditIcon from '@/assets/icons/EditIcon';
+import { ProductTypes } from '@/pages/dashboard';
 import { Box, Image } from '@chakra-ui/react';
 import React, { FC } from 'react';
-
-interface ProductTypes {
-  title: string;
-  imageUrl: string;
-  price: string;
-}
 
 interface CardProps {
   item: ProductTypes;
@@ -43,7 +38,7 @@ const Card: FC<CardProps> = ({ item }) => {
         </Box>
       </Box>
 
-      <Image src={item.imageUrl} alt={'image'} />
+      <Image maxH={'200px'} src={item.imageurl} alt={'image'} />
 
       <Box p="6">
         <Box display="flex" alignItems="baseline"></Box>
@@ -55,7 +50,7 @@ const Card: FC<CardProps> = ({ item }) => {
           lineHeight="tight"
           noOfLines={1}
         >
-          {item.title}
+          {item.name}
         </Box>
 
         <Box>${item.price}</Box>

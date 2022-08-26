@@ -1,4 +1,4 @@
-import { Box, Button, Heading, useToast } from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, useToast } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { destroyCookie } from 'nookies';
 import React, { FC } from 'react';
@@ -46,7 +46,10 @@ const Navbar: FC<NavbarProps> = ({ stylingProps }) => {
           display={'flex'}
           justifyContent="space-between"
         >
-          <Heading>Product List</Heading>
+          <Flex gap={'1rem'} alignItems="center">
+            <Heading>Product List</Heading>
+            <Button colorScheme={'whatsapp'}>Add Product</Button>
+          </Flex>
 
           <Button colorScheme={'pink'} onClick={logoutHandler}>
             Logout

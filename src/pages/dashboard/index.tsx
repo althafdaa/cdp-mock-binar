@@ -1,37 +1,68 @@
-import DeleteIcon from '@/assets/icons/DeleteIcon';
-import EditIcon from '@/assets/icons/EditIcon';
 import Card from '@/components/General/Card';
 import PageWrapper from '@/components/General/PageWrapper';
-import { Box, Image } from '@chakra-ui/react';
+import { useApi } from '@/hooks/useApi';
+import { Box } from '@chakra-ui/react';
+import axios from 'axios';
 import type { GetServerSidePropsContext, NextPage } from 'next';
 import Head from 'next/head';
 import nookies from 'nookies';
+import { dehydrate, DehydratedState, QueryClient, useQuery } from 'react-query';
 
 interface DashboardPageType {
   token: string;
 }
 
-export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+export interface ProductTypes {
+  id: number;
+  name: string;
+  imageurl: string;
+  price: string;
+}
+
+export async function getServerSideProps(
+  ctx: GetServerSidePropsContext
+): Promise<{
+  props?: { token?: string; dehydratedState?: DehydratedState };
+  redirect?: { permanent: boolean; destination: string };
+}> {
   const { token } = nookies.get(ctx);
+  const queryClient = new QueryClient();
 
   if (!token) {
     return {
       redirect: { permanent: false, destination: '/' },
     };
-  } else {
-    return {
-      props: { token },
-    };
   }
+
+  await queryClient.prefetchQuery(['products'], async () => {
+    await axios.get('https://test-binar.herokuapp.com/v1/products', {
+      headers: {
+        Authorization: token,
+      },
+    });
+  });
+
+  const dehydratedState = JSON.parse(JSON.stringify(dehydrate(queryClient)));
+
+  return {
+    props: { token, dehydratedState },
+  };
 }
 
-const dummy = {
-  title: 'Rumah mewah',
-  price: '1500',
-  imageUrl: 'https://dummyimage.com/600x400/000/fff',
-};
-
 const DashboardPage: NextPage<DashboardPageType> = ({ token }) => {
+  const { instance } = useApi();
+  const { data, error, isLoading } = useQuery(['products'], async () => {
+    try {
+      const { data } = await instance.get('/v1/products');
+
+      return data.result;
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
+  if (isLoading) return <div>...Loading</div>;
+
   return (
     <>
       <Head>
@@ -44,9 +75,9 @@ const DashboardPage: NextPage<DashboardPageType> = ({ token }) => {
           gridTemplateColumns="repeat(3, minmax(0, 1fr))"
           gap={'0.5rem'}
         >
-          <Card item={dummy} />
-          <Card item={dummy} />
-          <Card item={dummy} />
+          {data?.map((item: ProductTypes, idx: number) => {
+            return <Card item={item} key={`${idx}-${item.id}`} />;
+          })}
         </Box>
       </PageWrapper>
     </>
