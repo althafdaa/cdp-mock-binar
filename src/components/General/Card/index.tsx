@@ -30,7 +30,7 @@ const Card: FC<CardProps> = ({ item, refetch }) => {
   const toast = useToast();
   const deleteMutation = useMutation(async (id: number) => {
     try {
-      return instance.delete(`/v1/products/${id}`);
+      return await instance.delete(`/v1/products/${id}`);
     } catch (error) {
       const err = error as Error;
       throw new Error(err.message);

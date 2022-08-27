@@ -57,9 +57,9 @@ const UpdateProductModal: FC<UpdateProductModalTypes> = ({
 
       const payload = { name, imageurl, price };
 
-      if (!name) delete payload.name;
-      if (!imageurl) delete payload.imageurl;
-      if (!price) delete payload.price;
+      if (!name || name === item.name) delete payload.name;
+      if (!imageurl || name === item.imageurl) delete payload.imageurl;
+      if (!price || name === item.price) delete payload.price;
 
       try {
         return await instance.put(`/v1/products${data.id}`, {

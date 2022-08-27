@@ -23,6 +23,8 @@ npm run dev
 
 # About The Project
 
+[https://cdp-mock-binar.vercel.app/](https://cdp-mock-binar.vercel.app/)
+
 This is a mock test for the completion of Binar Academy Career Development Program. Assignee was asked to mimick certain feature and design while consuming REST API provided.The project itself is bootsrapped with [Create T3 App](https://github.com/t3-oss/create-t3-app)
 
 ```
@@ -85,3 +87,4 @@ Most of the tech used in this project is new to me, this is probably my first ev
 
 - The status response really bad. all the response returned 200 and i can't catch an error wit trycatch block and need to catch it manually inside try block which is kinda tedious and not best practice
 - And how the `/v1/products` sorted is kinda weird, it is not sorted by Date by default and i don't think there's query parameter to set that up
+- There's an error in .put and .delete method in `/v1/products/${id}`, but i believe the code is fine
