@@ -1,16 +1,5 @@
-import HamburgerIcon from '@/assets/icons/HamburgerIcon';
 import HamburgerDropdown from '@/components/HamburgerDropdown';
-import {
-  Box,
-  Button,
-  Flex,
-  Heading,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  useToast,
-} from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, useToast } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { destroyCookie } from 'nookies';
 import React, { FC } from 'react';
