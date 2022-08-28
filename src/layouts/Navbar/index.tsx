@@ -1,4 +1,16 @@
-import { Box, Button, Flex, Heading, useToast } from '@chakra-ui/react';
+import HamburgerIcon from '@/assets/icons/HamburgerIcon';
+import HamburgerDropdown from '@/components/HamburgerDropdown';
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  useToast,
+} from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { destroyCookie } from 'nookies';
 import React, { FC } from 'react';
@@ -49,14 +61,24 @@ const Navbar: FC<NavbarProps> = ({ stylingProps, onOpen }) => {
         >
           <Flex gap={'1rem'} alignItems="center">
             <Heading>Product List</Heading>
-            <Button colorScheme={'whatsapp'} onClick={onOpen}>
+            <Button
+              display={{ base: 'none', md: 'block' }}
+              colorScheme={'whatsapp'}
+              onClick={onOpen}
+            >
               Add Product
             </Button>
           </Flex>
 
-          <Button colorScheme={'pink'} onClick={logoutHandler}>
+          <Button
+            display={{ base: 'none', md: 'block' }}
+            colorScheme={'pink'}
+            onClick={logoutHandler}
+          >
             Logout
           </Button>
+
+          <HamburgerDropdown onOpen={onOpen} logoutHandler={logoutHandler} />
         </Box>
       </Box>
       <Box pt={'130px'}></Box>

@@ -46,7 +46,7 @@ export async function getServerSideProps(
       }
     );
 
-    return data.result.reverse();
+    return data.result;
   });
 
   const dehydratedState = dehydrate(queryClient);
@@ -66,7 +66,7 @@ const DashboardPage: NextPage<DashboardPageType> = () => {
       try {
         const { data } = await instance.get('/v1/products');
 
-        return data.result.reverse();
+        return data.result;
       } catch (error) {
         console.log(error);
       }

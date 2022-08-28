@@ -17,13 +17,13 @@ export const RegisterValidationSchema = y.object().shape({
 export const AddProductValidationSchema = y.object().shape({
   name: y.string().required('Name is required'),
   price: y.number().required('Price is required'),
-  imageurl: y
-    .string()
-    .matches(
-      /((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/,
-      'Enter correct url!'
-    )
-    .required('Image url is required'),
+  imageurl: y.string().required('Image url is required'),
+});
+
+export const UpdateProductValidationSchema = y.object().shape({
+  name: y.string().required('Name is required'),
+  price: y.number().required('Price is required'),
+  imageurl: y.string().required('Image url is required'),
 });
 
 export const isFormInvalid = (name: string, formik: any) => {

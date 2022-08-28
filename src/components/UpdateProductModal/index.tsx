@@ -1,6 +1,9 @@
 import { useApi } from '@/hooks/useApi';
 import { ProductTypes } from '@/pages/dashboard';
-import { AddProductValidationSchema, isFormInvalid } from '@/utils/validation';
+import {
+  isFormInvalid,
+  UpdateProductValidationSchema,
+} from '@/utils/validation';
 import {
   Modal,
   ModalOverlay,
@@ -37,7 +40,7 @@ interface UpdateProductModalTypes {
 }
 
 interface UpdateProductModalFormikType {
-  id: number;
+  id?: number;
   name?: string;
   price?: string;
   imageurl?: string;
@@ -55,6 +58,14 @@ const UpdateProductModal: FC<UpdateProductModalTypes> = ({
     async (data: UpdateProductModalFormikType) => {
       const { name, imageurl, price } = data || {};
 
+      if (
+        name === item.name &&
+        imageurl === item.imageurl &&
+        price === item.price
+      ) {
+        return 'NOT_CHANGED';
+      }
+
       const payload = { name, imageurl, price };
 
       if (!name || name === item.name) delete payload.name;
@@ -62,7 +73,7 @@ const UpdateProductModal: FC<UpdateProductModalTypes> = ({
       if (!price || price === item.price) delete payload.price;
 
       try {
-        return await instance.put(`/v1/products${data.id}`, {
+        return await instance.put(`/v1/products${item.id}`, {
           ...payload,
         });
       } catch (error) {
@@ -78,9 +89,21 @@ const UpdateProductModal: FC<UpdateProductModalTypes> = ({
       actions: FormikHelpers<any>
     ) => {
       updateProductMutation.mutate(
-        { ...values, id: item.id },
+        { ...values },
         {
-          onSuccess: () => {
+          onSuccess: (val) => {
+            if (val === 'NOT_CHANGED') {
+              onClose();
+              actions.resetForm();
+              toast({
+                status: 'info',
+                title: "There's no change in the product",
+                duration: 1000,
+                position: 'top-right',
+              });
+              return;
+            }
+
             refetch();
             toast({
               status: 'success',
@@ -103,12 +126,11 @@ const UpdateProductModal: FC<UpdateProductModalTypes> = ({
       );
     },
     initialValues: {
-      id: item.id,
       name: item.name,
       price: item.price,
       imageurl: item.imageurl,
     },
-    validationSchema: AddProductValidationSchema,
+    validationSchema: UpdateProductValidationSchema,
   });
 
   return (
